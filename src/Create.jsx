@@ -1,55 +1,86 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
+function Create() {
+  const [value, setValue] = useState({ name: "", email: "" });
+  const navigate = useNavigate();
 
-const Create = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-    const [value,setvalue]=useState({
-        name :'',
-        email :'',
-        age : ''
-    })
+    const oldData = JSON.parse(localStorage.getItem("persons")) || [];
 
-    const navidate = useNavigate()
+    const lastId =
+      oldData.length > 0
+        ? Math.max(...oldData.map((item) => item.id))
+        : 0;
 
+    const newUser = {
+      id: lastId + 1,
+      name: value.name,
+      email: value.email,
+    };
 
-    const handleSubmit = (event) =>{
-        event.preventDefault();
-         axios.post("http://localhost:3000/persons",value)
-            .then(res => {
-                console.log(res)
-            })
-            .catch(err => console.log(err))
-            navidate ('/')
-    }
+    const updated = [...oldData, newUser];
+
+    localStorage.setItem("persons", JSON.stringify(updated));
+    navigate("/");
+  };
+
   return (
-    <div className='d-flex w-100 vh-100 justify-content-center align-items-center bg-light'>
-        <div className='w-50 border bg-white shadow px-5 pt-3 pb-5 rounded'>
-            <h1>Add a User</h1>
-            <form onSubmit={handleSubmit}>
-                <div className='mb-2'>
-                    <label htmlFor="name">Name:</label>
-                    <input type="text"  name='name' className='form-control' placeholder='Enter name'
-                    onChange={e => setvalue({...value, name : e.target.value})}/>
-                </div>
-                <div className='mb-2'>
-                    <label htmlFor="email">Email:</label>
-                    <input type="email"  name='email' className='form-control' placeholder='Enter Email'
-                    onChange={e => setvalue({...value, email : e.target.value})}/>
-                </div>
-                <div className='mb-2'>
-                    <label htmlFor="age">Age:</label>
-                    <input type="age"  name='age' className='form-control' placeholder='Enter age'/>
-                </div>
+    <div className="min-h-screen bg-gray-100 flex justify-center items-center px-4">
+      <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-2xl">
 
-                <button className='btn btn-success'>Submit</button>
-                <Link to="/" className='btn btn-primary ms-3'>Back</Link>
-            </form>
-        </div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          Add User
+        </h2>
 
+        <form onSubmit={handleSubmit} className="space-y-4">
+
+          <div>
+            <label className="block mb-1 text-gray-600">Name</label>
+            <input
+              type="text"
+              value={value.name}
+              onChange={(e) =>
+                setValue({ ...value, name: e.target.value })
+              }
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 text-gray-600">Email</label>
+            <input
+              type="email"
+              value={value.email}
+              onChange={(e) =>
+                setValue({ ...value, email: e.target.value })
+              }
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg transition"
+          >
+            Submit
+          </button>
+
+          <Link
+            to="/"
+            className="block text-center text-sm text-gray-500 mt-3 hover:underline"
+          >
+            Back
+          </Link>
+
+        </form>
+      </div>
     </div>
-  )
+  );
 }
 
-export default Create
+export default Create;

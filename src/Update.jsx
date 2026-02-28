@@ -1,70 +1,92 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 
-const Update = () => {
-
+function Update() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [value, setvalue] = useState({
-    name: '',
-    email: ''
+  const [value, setValue] = useState({
+    id: "",
+    name: "",
+    email: "",
   });
 
-  // 🔹 Old data fetch karega
   useEffect(() => {
-    axios.get(`http://localhost:3000/persons/${id}`)
-      .then(res => {
-        setvalue(res.data)   // 👈 yaha old data set ho raha hai
-      })
-      .catch(err => console.log(err))
+    const oldData = JSON.parse(localStorage.getItem("persons")) || [];
+    const user = oldData.find((d) => d.id == id);
+    if (user) {
+      setValue(user);
+    }
   }, [id]);
 
-  // 🔹 Update function
-  const handleUpdate = (event) => {
-    event.preventDefault();
+  const handleUpdate = (e) => {
+    e.preventDefault();
 
-    axios.put(`http://localhost:3000/persons/${id}`, value)
-      .then(res => {
-        navigate('/')   // 👈 update hone ke baad home
-      })
-      .catch(err => console.log(err))
-  }
+    const oldData = JSON.parse(localStorage.getItem("persons")) || [];
+
+    const updated = oldData.map((d) =>
+      d.id == id ? value : d
+    );
+
+    localStorage.setItem("persons", JSON.stringify(updated));
+    navigate("/");
+  };
 
   return (
-    <div className="d-flex w-100 vh-100 justify-content-center align-items-center bg-light">
-      <div className="w-50 border bg-white shadow px-5 pt-3 pb-5 rounded">
-        <h1>Update a User</h1>
+    <div className="min-h-screen bg-gray-100 flex justify-center items-center px-4">
+      <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-2xl">
 
-        <form onSubmit={handleUpdate}>
-          <div className="mb-2">
-            <label>Name:</label>
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          Update User
+        </h2>
+
+        <form onSubmit={handleUpdate} className="space-y-4">
+
+          <div>
+            <label className="block mb-1 text-gray-600">Name</label>
             <input
               type="text"
-              className="form-control"
               value={value.name}
-              onChange={e => setvalue({ ...value, name: e.target.value })}
+              onChange={(e) =>
+                setValue({ ...value, name: e.target.value })
+              }
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              required
             />
           </div>
 
-          <div className="mb-2">
-            <label>Email:</label>
+          <div>
+            <label className="block mb-1 text-gray-600">Email</label>
             <input
               type="email"
-              className="form-control"
               value={value.email}
-              onChange={e => setvalue({ ...value, email: e.target.value })}
+              onChange={(e) =>
+                setValue({ ...value, email: e.target.value })
+              }
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              required
             />
           </div>
 
-          <button className="btn btn-success">Update</button>
-          <Link to="/" className="btn btn-primary ms-3">Back</Link>
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg transition"
+          >
+            Update
+          </button>
+
+          <Link
+            to="/"
+            className="block text-center text-sm text-gray-500 mt-3 hover:underline"
+          >
+            Back
+          </Link>
+
         </form>
 
       </div>
     </div>
   );
-};
+}
 
 export default Update;

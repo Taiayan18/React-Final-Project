@@ -1,80 +1,108 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-const Home = () => {
-  const [data, setdata] = useState([]);
-  const navigate = useNavigate();
+function Home() {
+
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/persons")
-      .then((res) => setdata(res.data))
-      .catch((err) => console.log(err));
+  const stored = JSON.parse(localStorage.getItem("persons"));
+
+  // Agar localStorage empty hai to default 2 users add karo
+  if (!stored || stored.length === 0) {
+    const defaultUsers = [
+      {
+        id: 1,
+        name: "Rahul",
+        email: "rahul@gmail.com",
+      },
+      {
+        id: 2,
+        name: "Amit",
+        email: "amit@gmail.com",
+      },
+    ];
+
+    localStorage.setItem("persons", JSON.stringify(defaultUsers));
+    setData(defaultUsers);
+  } else {
+    setData(stored);
+  }
+}, []);
+
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("persons")) || [];
+    setData(stored);
   }, []);
 
-  const heandleDelet = (id) => {
-    const confirm = window.confirm("Would You Like To Delete?");
-
+  const handleDelete = (id) => {
+    const confirm = window.confirm("Are you sure?");
     if (confirm) {
-      axios
-        .delete(`http://localhost:3000/persons/${id}`)
-        .then(() => {
-          // state se remove karo
-          setdata(data.filter((user) => user.id !== id));
-        })
-        .catch((err) => console.log(err));
+      const updated = data.filter((d) => d.id !== id);
+      setData(updated);
+      localStorage.setItem("persons", JSON.stringify(updated));
     }
   };
-  return (
-    <div className="d-flex flex-column justify-content-center align-items-center bg-light vh-100">
-      <h1>List of User</h1>
 
-      <div className="w-75 rounded bg-white border shadow p-4">
-        <div className="d-flex justify-content-end">
-          <Link to="/create" className="btn btn-success">
-            Add +
-          </Link>
-        </div>
+return (
+  <div className="min-h-screen bg-gray-100 flex justify-center items-start py-12 px-4">
+    <div className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl p-8">
 
-        <table className="table table-stiped">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold text-gray-800">
+          User Management
+        </h2>
 
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((d, i) => (
-              <tr key={i}>
-                <td>{d.id}</td>
-                <td>{d.name}</td>
-                <td>{d.email}</td>
-                
-                <td>
-                  <Link
-                    to={`/update/${d.id}`}
-                    className="btn btn-sm btn-primary me-2"
-                  >
-                    ✏️ Edit
-                  </Link>
-                  <button
-                    onClick={() => heandleDelet(d.id)}
-                    className="btn btn-sm btn-danger"
-                  >
-                    🗑️ Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Link
+          to="/create"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg transition"
+        >
+          + Add User
+        </Link>
       </div>
+
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-gray-200 text-gray-700">
+            <th className="py-3 px-4 text-left">ID</th>
+            <th className="px-4 text-left">Name</th>
+            <th className="px-4 text-left">Email</th>
+            <th className="px-4 text-center">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {data.map((d) => (
+            <tr
+              key={d.id}
+              className="border-b hover:bg-gray-50 transition"
+            >
+              <td className="py-3 px-4">{d.id}</td>
+              <td className="px-4">{d.name}</td>
+              <td className="px-4">{d.email}</td>
+              <td className="px-4 text-center space-x-2">
+                <Link
+                  to={`/update/${d.id}`}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
+                >
+                  ✏️ Edit
+                </Link>
+                <button
+                  onClick={() => handleDelete(d.id)}
+                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm"
+                >
+                 🗑️ Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
     </div>
-  );
-};
+  </div>
+);
+}
 
 export default Home;
