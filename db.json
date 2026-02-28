@@ -1,0 +1,40 @@
+{
+  "persons": [
+    {
+      "id": 1,
+      "name": "Rahul",
+      "email": "rahul@gmail.com"
+    },
+    {
+      "id": 2,
+      "name": "Amit",
+      "email": "amit@gmail.com"
+    },
+    {
+      "id": 4,
+      "name": "priya",
+      "email": "riya@gmail.com"
+    },
+    {
+      "id": 5,
+      "name": "Karan",
+      "email": "karan@gmail.com"
+    },
+    {
+      "name": "Tai Ayan",
+      "email": "ayantai69@gmail.com",
+      "id": 6
+    },
+    {
+      "name": "arman",
+      "email": "arman@gmail.com",
+      "id": 7
+    },
+    {
+      "name": "alfaj",
+      "email": "alfaj@gmail.com",
+      "age": "",
+      "id": 8
+    }
+  ]
+}
